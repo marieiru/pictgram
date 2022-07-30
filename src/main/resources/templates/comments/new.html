@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/layout}">
+  <head>
+    <title>Pictgram</title>
+  </head>
+  <body>
+<div class="comments-new-wrapper" layout:fragment="contents">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 mx-auto">
+        <h1 class="text-center" th:text="#{comments.new.title}">Add Comment</h1>
+        <form class="new_comment" id="new_comment" th:action="@{/topics/__${form.topicId}__/comment}" th:object="${form}">
+          <div layout:replace="~{layouts/common::messages}"></div>
+          <div class="mb-3">
+            <label class="form-label text-black" for="comment_description" th:text="#{comments.new.description}">Description</label>
+            <textarea class="form-control" th:field="*{description}" rows="10" th:errorclass="error-field"></textarea><p th:if="${#fields.hasErrors('description')}" class="error-message" th:errors="*{description}"></p>
+          </div>
+          <input type="submit" value="投稿" class="btn w-100 btn-outline-dark" th:value="#{comments.new.submit}"/>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </body>
+</html>

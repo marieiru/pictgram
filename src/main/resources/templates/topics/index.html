@@ -34,11 +34,30 @@
 								<img src="/images/icons/heart-black.png"
 								th:src="@{/images/icons/heart-black.png}" />
 							</a> <span class="count" th:text="${#lists.size(topic.favorites)}">0</span>
+
+							<a href="/topics/1/comments/new"
+								th:href="@{'/topics/{id}/comments/new'(id=${topic.id})}"
+								class="icon" th:data-_csrf="${_csrf.token}"> <img
+								src="/images/icons/comment.png"
+								th:src="@{/images/icons/comment.png}" />
+							</a>
+
 						</div>
 
 
 
 						<pre class="description" th:text="${topic.description}"></pre>
+
+						<div class="comments">
+							<h3 class='text-center' th:text="#{topics.index.comment}">コメント</h3>
+							<ul th:each="comment : ${topic.comments}">
+								<li><pre class="description"
+										th:text="${comment.description}"></pre></li>
+							</ul>
+						</div>
+
+
+
 					</main>
 				</div>
 			</div>
