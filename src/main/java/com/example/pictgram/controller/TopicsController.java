@@ -50,6 +50,13 @@ import com.example.pictgram.entity.Comment;
 import com.example.pictgram.form.CommentForm;
 
 
+
+import com.example.pictgram.service.S3Wrapper;
+
+
+
+
+
 @Controller
 public class TopicsController {
 
@@ -68,8 +75,20 @@ public class TopicsController {
 	private HttpServletRequest request;
 
 	@Value("${image.local:false}")
+
 	private String imageLocal;
 
+	   @Value("${AWS_BUCKET}")
+	   private String awsBucket;
+
+	   @Value("${AWS_DEFAULT_REGION}")
+	   private String awsDefaultRegion;
+
+	   @Autowired
+	   S3Wrapper s3;	
+	
+	
+	
 	@GetMapping(path = "/topics")
 	public String index(Principal principal, Model model) throws IOException {
 		Authentication authentication = (Authentication) principal;
@@ -201,6 +220,14 @@ public class TopicsController {
 		entity.setDescription(form.getDescription());
 		repository.saveAndFlush(entity);
 
+		
+		       if (!isImageLocal) {
+			           String url = saveImageS3(image, entity);
+			           entity.setPath(url);
+			           repository.saveAndFlush(entity);
+			       }	
+		
+		
 		redirAttrs.addFlashAttribute("hasMessage", true);
 		redirAttrs.addFlashAttribute("class", "alert-info");
 		redirAttrs.addFlashAttribute("message",
@@ -225,4 +252,18 @@ public class TopicsController {
 		return destFile;
 	}
 
+	
+	   private String saveImageS3(MultipartFile image, Topic entity)
+	   throws IOException {
+	       String path = "uploads/topic/image/" + entity.getId() + "/" + image.getOriginalFilename();
+	       s3.upload(image.getInputStream(), path);
+	       String fileName = image.getOriginalFilename();
+	       File destFile = File.createTempFile("s3_", ".tmp");
+	       image.transferTo(destFile);
+	
+	       String url = "https://" + awsBucket + ".s3-" + awsDefaultRegion + ".amazonaws.com/" + path;
+	
+	       return url;
+	   }	
+	
 }
